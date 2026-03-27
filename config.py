@@ -66,4 +66,4 @@ TELEGRAM_ENABLED = True
 # export TELEGRAM_CHAT_ID="your_chat_id_here"
 # If not set, will automatically load from OpenClaw config (~/.openclaw/openclaw.json)
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
-TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "-1001003884427758")  # HSI channel (negative for channels)
+TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "")  # Required: Set via environment variable  # HSI channel (negative for channels)

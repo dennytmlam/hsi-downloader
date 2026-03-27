@@ -45,3 +45,13 @@ env/
 config.py.local
 *.env
 secrets.json
+
+# Telegram and API secrets
+config.py.local
+config.py.bak
+*.local
+*.bak
+.env
+.env.local
+secrets.json
+credentials.json
