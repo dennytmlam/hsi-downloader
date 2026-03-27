@@ -21,17 +21,21 @@ class HSINotifier:
         
         # Try to load from OpenClaw config if not set
         if not self.bot_token:
-            self.bot_token = self._load_from_openclaw_config()
+            self.bot_token = self._load_bot_token_from_openclaw_config()
         
         if self.enabled and not self.bot_token:
             logger.warning("Telegram notifications enabled but BOT_TOKEN not set")
             self.enabled = False
         
         if self.enabled and not self.chat_id:
+            # Try to load chat ID from OpenClaw config as fallback
+            self.chat_id = self._load_chat_id_from_openclaw_config()
+        
+        if self.enabled and not self.chat_id:
             logger.warning("Telegram notifications enabled but CHAT_ID not set")
             self.enabled = False
     
-    def _load_from_openclaw_config(self):
+    def _load_bot_token_from_openclaw_config(self):
         """Load Telegram bot token from OpenClaw config"""
         config_path = os.path.expanduser("~/.openclaw/openclaw.json")
         try:
@@ -43,6 +47,25 @@ class HSINotifier:
             if bot_token:
                 logger.info("Loaded Telegram bot token from OpenClaw config")
                 return bot_token
+        except (OSError, json.JSONDecodeError) as e:
+            logger.debug(f"Could not load OpenClaw config: {e}")
+        
+        return ""
+    
+    def _load_chat_id_from_openclaw_config(self):
+        """Load Telegram chat ID from OpenClaw config (first enabled group)"""
+        config_path = os.path.expanduser("~/.openclaw/openclaw.json")
+        try:
+            with open(config_path, 'r') as f:
+                config = json.load(f)
+            
+            groups = config.get('channels', {}).get('telegram', {}).get('accounts', {}).get('default', {}).get('groups', {})
+            
+            # Find first enabled group
+            for chat_id, settings in groups.items():
+                if settings.get('enabled', False):
+                    logger.info(f"Loaded Telegram chat ID from OpenClaw config: {chat_id}")
+                    return chat_id
         except (OSError, json.JSONDecodeError) as e:
             logger.debug(f"Could not load OpenClaw config: {e}")
         
